@@ -3,8 +3,7 @@ from bs4 import BeautifulSoup
 from openpyxl import Workbook
 
 
-def get_courses_list():
-    number_of_courses = 1
+def get_courses_list(number_of_courses=5):
     courses_list_url = 'https://www.coursera.org/sitemap~www~courses.xml'
     response_xml = requests.get(courses_list_url).content.decode()
 
@@ -22,15 +21,23 @@ def get_course_info(course_url):
     course_soup = BeautifulSoup(course_page_html, 'lxml')
 
     course_name = course_soup.find(attrs={'class': 'course-title'}).text
+
     course_lang = course_soup.find(attrs={
-        'class': 'rc-Language'}).text.split()[0]
-    start, month, day = course_soup.find(attrs={
-        'class': 'startdate'}).text.split()
-    course_startdate = '{} {}'.format(month, day)
-    course_duration = course_soup.find_all(attrs={
-        'class': 'td-data'})[1].text
-    course_rating = course_soup.find(attrs={
-        'class': 'ratings-text'}).text.split()[0]
+        'class': 'rc-Language'}).text.split(',')[0]
+
+    course_startdate = course_soup.find(attrs={
+        'class': 'startdate'}).text
+
+    weeks = course_soup.find_all('div', attrs={'class': 'week-heading'})
+    weeks_nums = [int(week.text.split()[1]) for week in weeks]
+    course_duration = '{} weeks'.format(str(max(weeks_nums)))
+
+    try:
+        course_rating = course_soup.find(attrs={
+            'class': 'ratings-text'}).text
+    except AttributeError:
+        course_rating = None
+
     return [
         course_name,
         course_lang,
@@ -44,6 +51,15 @@ def output_courses_info_to_xlsx(path_to_output_xlsx, courses_info_list):
     wb = Workbook()
     ws = wb.active
 
+    headers = [
+        'Course name',
+        'Language',
+        'Start date',
+        'Course duration',
+        'Course rating'
+    ]
+    ws.append(headers)
+
     for course in courses_info_list:
         ws.append(course)
 
@@ -51,9 +67,12 @@ def output_courses_info_to_xlsx(path_to_output_xlsx, courses_info_list):
 
 
 if __name__ == '__main__':
+    number_of_courses = 25
     path_to_output_xlsx = 'courses_info.xlsx'
 
-    courses_url_list = get_courses_list()
+    courses_url_list = get_courses_list(number_of_courses)
     courses_info_list = []
     for course in courses_url_list:
         courses_info_list.append(get_course_info(course))
+
+    output_courses_info_to_xlsx(path_to_output_xlsx, courses_info_list)
