@@ -1,4 +1,4 @@
-from random import randint
+from random import sample
 import requests
 from bs4 import BeautifulSoup
 from openpyxl import Workbook
@@ -14,10 +14,7 @@ def get_courses_list(number_of_courses):
     for loc in xml_page.find_all('loc'):
         full_courses_urls.append(loc.text)
 
-    courses_urls = []
-    for counter in range(number_of_courses):
-        courses_urls.append(
-            full_courses_urls[randint(0, len(full_courses_urls) - 1)])
+    courses_urls = sample(full_courses_urls, number_of_courses)
 
     return courses_urls
 
