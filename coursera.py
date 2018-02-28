@@ -4,6 +4,7 @@ from openpyxl import Workbook
 
 
 def get_courses_list():
+    number_of_courses = 1
     courses_list_url = 'https://www.coursera.org/sitemap~www~courses.xml'
     response_xml = requests.get(courses_list_url).content.decode()
 
@@ -11,7 +12,7 @@ def get_courses_list():
 
     courses_urls = []
     for num, loc in enumerate(xml_page.find_all('loc')):
-        if num < 20:
+        if num < number_of_courses:
             courses_urls.append(loc.text)
     return courses_urls
 
@@ -30,11 +31,13 @@ def get_course_info(course_url):
         'class': 'td-data'})[1].text
     course_rating = course_soup.find(attrs={
         'class': 'ratings-text'}).text.split()[0]
-    return [course_name,
-            course_lang,
-            course_startdate,
-            course_duration,
-            course_rating]
+    return [
+        course_name,
+        course_lang,
+        course_startdate,
+        course_duration,
+        course_rating
+    ]
 
 
 def output_courses_info_to_xlsx(path_to_output_xlsx, courses_info_list):
