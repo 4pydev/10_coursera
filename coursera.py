@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+from openpyxl import Workbook
 
 
 def get_courses_list():
@@ -15,13 +16,41 @@ def get_courses_list():
     return courses_urls
 
 
-def get_course_info(course_slug):
-    pass
+def get_course_info(course_url):
+    course_page_html = requests.get(course_url).content.decode()
+    course_soup = BeautifulSoup(course_page_html, 'lxml')
+
+    course_name = course_soup.find(attrs={'class': 'course-title'}).text
+    course_lang = course_soup.find(attrs={
+        'class': 'rc-Language'}).text.split()[0]
+    start, month, day = course_soup.find(attrs={
+        'class': 'startdate'}).text.split()
+    course_startdate = '{} {}'.format(month, day)
+    course_duration = course_soup.find_all(attrs={
+        'class': 'td-data'})[1].text
+    course_rating = course_soup.find(attrs={
+        'class': 'ratings-text'}).text.split()[0]
+    return [course_name,
+            course_lang,
+            course_startdate,
+            course_duration,
+            course_rating]
 
 
-def output_courses_info_to_xlsx(filepath):
-    pass
+def output_courses_info_to_xlsx(path_to_output_xlsx, courses_info_list):
+    wb = Workbook()
+    ws = wb.active
+
+    for course in courses_info_list:
+        ws.append(course)
+
+    wb.save(path_to_output_xlsx)
 
 
 if __name__ == '__main__':
-    print(get_courses_list())
+    path_to_output_xlsx = 'courses_info.xlsx'
+
+    courses_url_list = get_courses_list()
+    courses_info_list = []
+    for course in courses_url_list:
+        courses_info_list.append(get_course_info(course))
