@@ -1,18 +1,24 @@
+from random import randint
 import requests
 from bs4 import BeautifulSoup
 from openpyxl import Workbook
 
 
-def get_courses_list(number_of_courses=5):
+def get_courses_list(number_of_courses):
     courses_list_url = 'https://www.coursera.org/sitemap~www~courses.xml'
     response_xml = requests.get(courses_list_url).content.decode()
 
     xml_page = BeautifulSoup(response_xml, 'xml')
 
+    full_courses_urls = []
+    for loc in xml_page.find_all('loc'):
+        full_courses_urls.append(loc.text)
+
     courses_urls = []
-    for num, loc in enumerate(xml_page.find_all('loc')):
-        if num < number_of_courses:
-            courses_urls.append(loc.text)
+    for counter in range(number_of_courses):
+        courses_urls.append(
+            full_courses_urls[randint(0, len(full_courses_urls) - 1)])
+
     return courses_urls
 
 
@@ -67,7 +73,7 @@ def output_courses_info_to_xlsx(path_to_output_xlsx, courses_info_list):
 
 
 if __name__ == '__main__':
-    number_of_courses = 25
+    number_of_courses = 20
     path_to_output_xlsx = 'courses_info.xlsx'
 
     courses_url_list = get_courses_list(number_of_courses)
