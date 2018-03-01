@@ -49,7 +49,7 @@ def get_course_info(course_url):
     }
 
 
-def output_courses_info_to_xlsx(path_to_output_xlsx, courses_info_list):
+def output_courses_info_to_xlsx(courses_info_list):
     wb = Workbook()
     ws = wb.active
 
@@ -72,7 +72,7 @@ def output_courses_info_to_xlsx(path_to_output_xlsx, courses_info_list):
         ]
         ws.append(current_course)
 
-    wb.save(path_to_output_xlsx)
+    return wb
 
 
 if __name__ == '__main__':
@@ -84,4 +84,6 @@ if __name__ == '__main__':
     for course in courses_url_list:
         courses_info_list.append(get_course_info(course))
 
-    output_courses_info_to_xlsx(path_to_output_xlsx, courses_info_list)
+    current_workbook = output_courses_info_to_xlsx(courses_info_list)
+    current_workbook.save(path_to_output_xlsx)
+
