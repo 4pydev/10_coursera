@@ -31,9 +31,8 @@ def get_course_info(course_url):
     course_startdate = course_soup.find(attrs={
         'class': 'startdate'}).text
 
-    weeks = course_soup.find_all('div', attrs={'class': 'week-heading'})
-    weeks_nums = [int(week.text.split()[1]) for week in weeks]
-    course_duration = '{} weeks'.format(str(max(weeks_nums)))
+    course_duration = '{} weeks'.format(len(
+        course_soup.find_all('div', attrs={'class': 'week-heading'})))
 
     try:
         course_rating = course_soup.find(attrs={
