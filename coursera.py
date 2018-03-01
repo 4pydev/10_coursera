@@ -4,11 +4,9 @@ from bs4 import BeautifulSoup
 from openpyxl import Workbook
 
 
-def get_courses_xml_page():
-    courses_list_url = 'https://www.coursera.org/sitemap~www~courses.xml'
-    xml_course_page = requests.get(courses_list_url).content.decode()
-
-    return xml_course_page
+def get_page_from_coursera(url):
+    coursera_page = requests.get(url).content.decode()
+    return coursera_page
 
 
 def get_random_courses_url_list(xml_course_page, number_of_courses):
@@ -21,11 +19,6 @@ def get_random_courses_url_list(xml_course_page, number_of_courses):
     random_courses_urls = sample(full_courses_urls, number_of_courses)
 
     return random_courses_urls
-
-
-def get_html_course_page(course_url):
-    course_page_html = requests.get(course_url).content.decode()
-    return course_page_html
 
 
 def get_course_info(course_page_html):
@@ -84,17 +77,18 @@ def output_courses_info_to_xlsx(courses_info_list):
 
 
 if __name__ == '__main__':
+    courses_list_url = 'https://www.coursera.org/sitemap~www~courses.xml'
     number_of_courses = 20
     path_to_output_xlsx = 'courses_info.xlsx'
 
-    xml_course_page = get_courses_xml_page()
+    xml_course_page = get_page_from_coursera(courses_list_url)
 
     courses_url_list = get_random_courses_url_list(xml_course_page,
                                                    number_of_courses)
     courses_info_list = []
     for course_url in courses_url_list:
         courses_info_list.append(get_course_info(
-            get_html_course_page(course_url)))
+            get_page_from_coursera(course_url)))
 
     current_workbook = output_courses_info_to_xlsx(courses_info_list)
     current_workbook.save(path_to_output_xlsx)
