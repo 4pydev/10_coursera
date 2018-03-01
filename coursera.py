@@ -40,13 +40,13 @@ def get_course_info(course_url):
     except AttributeError:
         course_rating = None
 
-    return [
-        course_name,
-        course_lang,
-        course_startdate,
-        course_duration,
-        course_rating
-    ]
+    return {
+        'course_name': course_name,
+        'course_lang': course_lang,
+        'course_startdate': course_startdate,
+        'course_duration': course_duration,
+        'course_rating': course_rating
+    }
 
 
 def output_courses_info_to_xlsx(path_to_output_xlsx, courses_info_list):
@@ -63,7 +63,14 @@ def output_courses_info_to_xlsx(path_to_output_xlsx, courses_info_list):
     ws.append(headers)
 
     for course in courses_info_list:
-        ws.append(course)
+        current_course = [
+            course['course_name'],
+            course['course_lang'],
+            course['course_startdate'],
+            course['course_duration'],
+            course['course_rating']
+        ]
+        ws.append(current_course)
 
     wb.save(path_to_output_xlsx)
 
