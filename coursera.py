@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 from openpyxl import Workbook
 
 
-def get_courses_list(number_of_courses):
+def get_random_courses_url_list(number_of_courses):
     courses_list_url = 'https://www.coursera.org/sitemap~www~courses.xml'
     response_xml = requests.get(courses_list_url).content.decode()
 
@@ -79,7 +79,7 @@ if __name__ == '__main__':
     number_of_courses = 20
     path_to_output_xlsx = 'courses_info.xlsx'
 
-    courses_url_list = get_courses_list(number_of_courses)
+    courses_url_list = get_random_courses_url_list(number_of_courses)
     courses_info_list = []
     for course in courses_url_list:
         courses_info_list.append(get_course_info(course))
