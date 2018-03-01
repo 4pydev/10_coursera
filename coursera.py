@@ -28,7 +28,6 @@ def get_html_course_page(course_url):
     return course_page_html
 
 
-
 def get_course_info(course_page_html):
     course_soup = BeautifulSoup(course_page_html, 'lxml')
 
@@ -99,4 +98,3 @@ if __name__ == '__main__':
 
     current_workbook = output_courses_info_to_xlsx(courses_info_list)
     current_workbook.save(path_to_output_xlsx)
-
