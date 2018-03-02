@@ -9,8 +9,8 @@ def get_page_from_coursera(url):
     return coursera_page
 
 
-def get_random_courses_url_list(xml_course_page, number_of_courses):
-    xml_course_soup = BeautifulSoup(xml_course_page, 'xml')
+def get_random_courses_url_list(xml_courses_page, number_of_courses):
+    xml_course_soup = BeautifulSoup(xml_courses_page, 'xml')
 
     full_courses_urls = []
     for loc in xml_course_soup.find_all('loc'):
@@ -21,23 +21,22 @@ def get_random_courses_url_list(xml_course_page, number_of_courses):
     return random_courses_urls
 
 
-def get_course_info(course_page_html):
-    course_soup = BeautifulSoup(course_page_html, 'lxml')
+def get_course_info(html_course_page):
+    course_soup = BeautifulSoup(html_course_page, 'lxml')
 
     course_name = course_soup.find(attrs={'class': 'course-title'}).text
 
-    course_lang = course_soup.find(attrs={
-        'class': 'rc-Language'}).text.split(',')[0]
+    course_lang = course_soup.find(
+        attrs={'class': 'rc-Language'},
+    ).text.split(',')[0]
 
-    course_startdate = course_soup.find(attrs={
-        'class': 'startdate'}).text
+    course_startdate = course_soup.find(attrs={'class': 'startdate'}).text
 
-    course_duration = '{} weeks'.format(len(
-        course_soup.find_all('div', attrs={'class': 'week-heading'})))
+    course_duration = '{} weeks'.format(
+        len(course_soup.find_all('div', attrs={'class': 'week-heading'})))
 
     try:
-        course_rating = course_soup.find(attrs={
-            'class': 'ratings-text'}).text
+        course_rating = course_soup.find(attrs={'class': 'ratings-text'}).text
     except AttributeError:
         course_rating = None
 
@@ -46,7 +45,7 @@ def get_course_info(course_page_html):
         'course_lang': course_lang,
         'course_startdate': course_startdate,
         'course_duration': course_duration,
-        'course_rating': course_rating
+        'course_rating': course_rating,
     }
 
 
@@ -59,7 +58,7 @@ def output_courses_info_to_xlsx(courses_info_list):
         'Language',
         'Start date',
         'Course duration',
-        'Course rating'
+        'Course rating',
     ]
     ws.append(headers)
 
@@ -69,7 +68,7 @@ def output_courses_info_to_xlsx(courses_info_list):
             course['course_lang'],
             course['course_startdate'],
             course['course_duration'],
-            course['course_rating']
+            course['course_rating'],
         ]
         ws.append(current_course)
 
@@ -81,10 +80,13 @@ if __name__ == '__main__':
     number_of_courses = 20
     path_to_output_xlsx = 'courses_info.xlsx'
 
-    xml_course_page = get_page_from_coursera(courses_list_url)
+    xml_courses_page = get_page_from_coursera(courses_list_url)
 
-    courses_url_list = get_random_courses_url_list(xml_course_page,
-                                                   number_of_courses)
+    courses_url_list = get_random_courses_url_list(
+        xml_courses_page,
+        number_of_courses,
+    )
+
     courses_info_list = []
     for course_url in courses_url_list:
         courses_info_list.append(get_course_info(
