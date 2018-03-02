@@ -1,7 +1,34 @@
+import os.path
+import argparse
 from random import sample
 import requests
 from bs4 import BeautifulSoup
 from openpyxl import Workbook
+
+
+def create_parser():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '-p',
+        '--path',
+        help='Path to directory you want to save output file',
+    )
+
+    return parser
+
+
+def get_path_to_output_dir(path):
+    if not path:
+        path_to_output_dir = ''
+    elif os.path.exists(path) and os.path.isdir(path):
+        path_to_output_dir = path
+    else:
+        print("Wrong path to output directory. "
+              "Output file will be saved into "
+              "current working directory.")
+        path_to_output_dir = ''
+
+    return path_to_output_dir
 
 
 def get_page_from_coursera(url):
@@ -76,9 +103,15 @@ def output_courses_info_to_xlsx(courses_info_list):
 
 
 if __name__ == '__main__':
+    parser = create_parser()
+    args = parser.parse_args()
+    path_to_output_xlsx = os.path.join(
+        get_path_to_output_dir(args.path),
+        'courses_info.xlsx',
+    )
+
     courses_list_url = 'https://www.coursera.org/sitemap~www~courses.xml'
     number_of_courses = 20
-    path_to_output_xlsx = 'courses_info.xlsx'
 
     xml_courses_page = get_page_from_coursera(courses_list_url)
 
